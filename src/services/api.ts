@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { Restaurant, RestaurantDetail, AvailableSlot, BookingRequest, BookingResponse, RestaurantAvailability } from '../types/api';
 
 const mockRestaurants: Restaurant[] = [
@@ -154,13 +155,22 @@ const mockRestaurantDetails: Record<string, RestaurantDetail> = {
 
 // Add more restaurant details as needed for other IDs
 
+const USE_REAL_BACKEND = true;
+
 const getRestaurants = async (): Promise<Restaurant[]> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
+  if (USE_REAL_BACKEND) {
+    const response = await axios.get<Restaurant[]>('http://localhost:8080/api/restaurants');
+    console.log('🔥 API 返回的数据是：', response.data); 
+    return response.data;
+  }
   return mockRestaurants;
 };
 
 const getRestaurantById = async (id: string): Promise<RestaurantDetail> => {
+
+  const response = await axios.get<RestaurantDetail>(`http://localhost:8080/api/restaurants/${id}`);
+  console.log("🌍 后端返回的餐厅详情是：", response.data);
+  return response.data;
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 700));
   

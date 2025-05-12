@@ -3,7 +3,7 @@
 export interface Restaurant {
   id: string;
   name: string;
-  thumbnailUrl: string;
+  thumbnailUrl: string; //card pic
   location: string;
   cuisine: string;
   hasEarlyBird: boolean;
