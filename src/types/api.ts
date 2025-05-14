@@ -28,12 +28,12 @@ export interface Offer {
 }
 
 // Availability types
-export type AvailableSlot = {
+export interface AvailableSlot {
   time: string;
-  type: "earlyBird" | "regular" | "lastMinute";
+  type: 'EARLY_BIRD' | 'REGULAR' | 'LAST_MINUTE';
   offerId?: string;
   discount?: string;
-};
+}
 
 export interface RestaurantAvailability {
   restaurantId: string;

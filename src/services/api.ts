@@ -160,7 +160,7 @@ const USE_REAL_BACKEND = true;
 const getRestaurants = async (): Promise<Restaurant[]> => {
   if (USE_REAL_BACKEND) {
     const response = await axios.get<Restaurant[]>('http://localhost:8080/api/restaurants');
-    console.log('🔥 API 返回的数据是：', response.data); 
+    console.log('API return data：', response.data); 
     return response.data;
   }
   return mockRestaurants;
@@ -169,7 +169,7 @@ const getRestaurants = async (): Promise<Restaurant[]> => {
 const getRestaurantById = async (id: string): Promise<RestaurantDetail> => {
 
   const response = await axios.get<RestaurantDetail>(`http://localhost:8080/api/restaurants/${id}`);
-  console.log("🌍 后端返回的餐厅详情是：", response.data);
+  console.log("The restaurant details returned by the back end are:", response.data);
   return response.data;
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 700));
@@ -210,34 +210,42 @@ const getRestaurantById = async (id: string): Promise<RestaurantDetail> => {
 
 // Update the getAvailability method to match proper name
 const getRestaurantAvailability = async (
-  restaurantId: string, 
+  restaurantId: string,
   date: string
 ): Promise<RestaurantAvailability> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  // Mock data
+  if (USE_REAL_BACKEND) {
+    const response = await axios.get<RestaurantAvailability>(
+      `http://localhost:8080/api/restaurants/${restaurantId}/availability`,
+      {
+        params: { date } // ?date=2025-05-30
+      }
+    );
+    console.log('✅ Real backend availability:', response.data);
+    return response.data;
+  }
+
+  // fallback mock data
   return {
     restaurantId,
     date,
     availableSlots: [
       {
         time: "17:30",
-        type: "earlyBird",
+        type: "EARLY_BIRD",
         offerId: "offer123"
       },
       {
         time: "18:00",
-        type: "earlyBird",
+        type: "EARLY_BIRD",
         offerId: "offer456"
       },
       {
         time: "19:30",
-        type: "regular"
+        type: "REGULAR"
       },
       {
         time: "20:30",
-        type: "lastMinute",
+        type: "LAST_MINUTE",
         discount: "20%"
       }
     ]
