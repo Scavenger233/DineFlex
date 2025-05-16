@@ -277,6 +277,26 @@ const getBookingById = async (id: string): Promise<BookingResponse> => {
   return response.data;
 };
 
+// Login API
+export const loginCustomer = async (payload: {
+  customerEmail: string;
+  password: string;
+}) => {
+  const response = await axios.post("http://localhost:8080/api/customers/login", payload);
+  return response.data; // Typically includes customer info and token
+};
+
+// Register API
+export const registerCustomer = async (payload: {
+  customerName: string;
+  customerEmail: string;
+  phone: string;
+  password: string;
+}) => {
+  const response = await axios.post("http://localhost:8080/api/customers/register", payload);
+  return response.data;
+};
+
 export const apiService = {
   getRestaurants,
   getRestaurantById,
