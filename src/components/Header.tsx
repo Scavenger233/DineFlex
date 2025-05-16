@@ -26,6 +26,16 @@ const Header = () => {
   const [activeTab, setActiveTab] = useState("login");
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState<{
+    customerName: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("customer");
+    if (stored) {
+      setCurrentUser(JSON.parse(stored));
+    }
+  }, []);
 
   // Handle scroll events to change header appearance
   useEffect(() => {
@@ -58,7 +68,9 @@ const Header = () => {
       // Optionally: save customer info or token
       localStorage.setItem("customer", JSON.stringify(res));
 
-      setAuthDialogOpen(false);
+      setCurrentUser(res); // Update UI logic first
+      setAuthDialogOpen(false); // Then close modal
+
       // Redirect to main page
       navigate("/");
     } catch (err: any) {
@@ -112,6 +124,15 @@ const Header = () => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("customer");
+    setCurrentUser(null);
+    toast({
+      title: "Logged out",
+      description: "You’ve been signed out.",
+    });
+  };
+
   return (
     <header
       className={cn(
@@ -159,16 +180,31 @@ const Header = () => {
 
           {/* Auth Dialog */}
           <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                onClick={() => setAuthDialogOpen(true)}
-                variant="outline"
-                className="border-dineflex-burgundy text-dineflex-burgundy hover:bg-dineflex-burgundy hover:text-white transition-colors"
-              >
-                <LogIn className="w-4 h-4 mr-2" />
-                <span>Sign In</span>
-              </Button>
-            </DialogTrigger>
+            {currentUser ? (
+              <div className="flex items-center gap-4">
+                <span className="text-dineflex-burgundy font-semibold">
+                  Welcome, {currentUser.customerName}
+                </span>
+                <Button
+                  variant="outline"
+                  className="border-dineflex-burgundy text-dineflex-burgundy hover:bg-dineflex-burgundy hover:text-white transition-colors"
+                  onClick={handleLogout}
+                >
+                  Log Out
+                </Button>
+              </div>
+            ) : (
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="border-dineflex-burgundy text-dineflex-burgundy hover:bg-dineflex-burgundy hover:text-white transition-colors"
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  <span>Sign In</span>
+                </Button>
+              </DialogTrigger>
+            )}
+
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle className="text-center text-2xl">
