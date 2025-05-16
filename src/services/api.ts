@@ -272,21 +272,9 @@ const createBooking = async (booking: BookingRequest): Promise<BookingResponse> 
 };
 
 const getBookingById = async (id: string): Promise<BookingResponse> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Mock data - in a real app, you would fetch from an API
-  return {
-    id,
-    status: "confirmed",
-    restaurantId: "1",
-    restaurantName: "The Sizzling Grill",
-    date: "2023-12-15",
-    time: "18:00",
-    partySize: 4,
-    customerName: "John Smith",
-    confirmationCode: `DINE${Math.floor(10000 + Math.random() * 90000)}`,
-  };
+  const response = await axios.get<BookingResponse>(`http://localhost:8080/api/bookings/${id}`);
+  console.log('✅ Booking fetched from backend:', response.data);
+  return response.data;
 };
 
 export const apiService = {
