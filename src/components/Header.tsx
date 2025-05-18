@@ -66,7 +66,15 @@ const Header = () => {
         description: `Welcome back, ${res.customerName}`,
       });
       // Optionally: save customer info or token
-      localStorage.setItem("customer", JSON.stringify(res));
+      localStorage.setItem(
+        "customer",
+        JSON.stringify({
+          // Keep consistency between front and back end
+          customerName: res.customerName,
+          customerEmail: res.customerEmail,
+          customerPhone: res.phone,
+        })
+      );
 
       setCurrentUser(res); // Update UI logic first
       setAuthDialogOpen(false); // Then close modal

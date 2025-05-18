@@ -1,13 +1,20 @@
-
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { BookingRequest } from '../types/api';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { BookingRequest } from "../types/api";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { format } from "date-fns";
 
 interface BookingFormProps {
   restaurantId: string;
@@ -20,43 +27,48 @@ interface BookingFormProps {
 const bookingFormSchema = z.object({
   partySize: z.coerce
     .number()
-    .min(1, { message: 'Party size must be at least 1' })
-    .max(12, { message: 'Party size cannot exceed 12' }),
-  customerName: z.string().min(2, { message: 'Name is required' }),
-  customerEmail: z.string().email({ message: 'Invalid email address' }),
-  customerPhone: z.string().min(7, { message: 'Valid phone number is required' }),
+    .min(1, { message: "Party size must be at least 1" })
+    .max(12, { message: "Party size cannot exceed 12" }),
+  customerName: z.string().min(2, { message: "Name is required" }),
+  customerEmail: z.string().email({ message: "Invalid email address" }),
+  customerPhone: z
+    .string()
+    .min(7, { message: "Valid phone number is required" }),
 });
 
 type BookingFormValues = z.infer<typeof bookingFormSchema>;
 
-const BookingForm: React.FC<BookingFormProps> = ({ 
-  restaurantId, 
-  date, 
-  time, 
+const BookingForm: React.FC<BookingFormProps> = ({
+  restaurantId,
+  date,
+  time,
   onSubmit,
-  isSubmitting
+  isSubmitting,
 }) => {
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
       partySize: 2,
-      customerName: '',
-      customerEmail: '',
-      customerPhone: '',
+      customerName: "",
+      customerEmail: "",
+      customerPhone: "",
     },
   });
 
   const handleSubmit = (values: BookingFormValues) => {
     const bookingData: BookingRequest = {
       restaurantId,
-      date: date.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      date: format(
+        new Date(date.getTime() - date.getTimezoneOffset() * 60000),
+        "yyyy-MM-dd"
+      ),
       time,
       partySize: values.partySize,
       customerName: values.customerName,
       customerEmail: values.customerEmail,
       customerPhone: values.customerPhone,
     };
-    
+
     onSubmit(bookingData);
   };
 
@@ -68,7 +80,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         <p className="text-sm">Date: {date.toLocaleDateString()}</p>
         <p className="text-sm">Time: {time}</p>
       </div>
-      
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <FormField
@@ -84,7 +96,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="customerName"
@@ -98,7 +110,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="customerEmail"
@@ -106,13 +118,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="john@example.com" {...field} />
+                  <Input
+                    type="email"
+                    placeholder="john@example.com"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="customerPhone"
@@ -126,9 +142,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
               </FormItem>
             )}
           />
-          
-          <Button 
-            type="submit" 
+
+          <Button
+            type="submit"
             className="w-full bg-dineflex-burgundy hover:bg-dineflex-burgundy/90 text-white"
             disabled={isSubmitting}
           >

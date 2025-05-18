@@ -28,11 +28,29 @@ const RestaurantDetail = () => {
 
   // Fetch availability for selected date
   const { data: availability, isLoading: isLoadingAvailability } = useQuery({
-    queryKey: ["availability", id, format(selectedDate, "yyyy-MM-dd")],
+    queryKey: [
+      "availability",
+      id,
+      // Fix time difference due to personal device setting
+      // UTC = local time - timezone offset
+      format(
+        new Date(
+          selectedDate.getTime() - selectedDate.getTimezoneOffset() * 60000
+        ),
+        "yyyy-MM-dd"
+      ),
+      // format(selectedDate, "yyyy-MM-dd"),
+    ],
     queryFn: () =>
       apiService.getRestaurantAvailability(
         id || "",
-        format(selectedDate, "yyyy-MM-dd")
+        // format(selectedDate, "yyyy-MM-dd")
+        format(
+          new Date(
+            selectedDate.getTime() - selectedDate.getTimezoneOffset() * 60000
+          ),
+          "yyyy-MM-dd"
+        )
       ),
     enabled: !!id,
   });
@@ -67,10 +85,35 @@ const RestaurantDetail = () => {
     }
   };
 
-  console.log("📅 Availability from backend:", availability);
-
   const handleBookingSubmit = (formData: BookingRequest) => {
-    createBookingMutation.mutate(formData);
+    const storedCustomer = localStorage.getItem("customer");
+
+    if (!storedCustomer) {
+      toast.error("Please log in to make a booking.");
+      return;
+    }
+
+    let customer;
+    try {
+      customer = JSON.parse(storedCustomer);
+    } catch (error) {
+      toast.error("Invalid user session. Please log in again.");
+      localStorage.removeItem("customer");
+      return;
+    }
+
+    if (!customer.customerEmail) {
+      toast.error("Missing customer email. Please log in again.");
+      return;
+    }
+
+    const completeForm: BookingRequest = {
+      ...formData,
+      customerName: customer.customerName,
+      customerEmail: customer.customerEmail,
+      customerPhone: customer.phone,
+    };
+    createBookingMutation.mutate(completeForm);
   };
 
   if (isLoadingRestaurant) {

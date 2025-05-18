@@ -254,21 +254,11 @@ const getRestaurantAvailability = async (
 
 // Rename to createBooking to match usage
 const createBooking = async (booking: BookingRequest): Promise<BookingResponse> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 1200));
-  
-  // Mock response data
-  return {
-    id: `booking-${Math.random().toString(36).substring(2, 9)}`,
-    status: "confirmed",
-    restaurantId: booking.restaurantId,
-    restaurantName: "Sample Restaurant", // In a real app, you'd fetch this from the restaurant data
-    date: booking.date,
-    time: booking.time,
-    partySize: booking.partySize,
-    customerName: booking.customerName,
-    confirmationCode: `DINE${Math.floor(10000 + Math.random() * 90000)}`,
-  };
+  const response = await axios.post<BookingResponse>(
+    "http://localhost:8080/api/bookings",
+    booking
+  );
+  return response.data;
 };
 
 const getBookingById = async (id: string): Promise<BookingResponse> => {
@@ -283,6 +273,10 @@ export const loginCustomer = async (payload: {
   password: string;
 }) => {
   const response = await axios.post("http://localhost:8080/api/customers/login", payload);
+
+  // Storing login information
+  localStorage.setItem("dineflexUser", JSON.stringify(response.data));
+
   return response.data; // Typically includes customer info and token
 };
 
