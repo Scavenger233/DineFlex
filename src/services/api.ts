@@ -272,7 +272,7 @@ export const loginCustomer = async (payload: {
   customerEmail: string;
   password: string;
 }) => {
-  const response = await axios.post("http://localhost:8080/api/customers/login", payload);
+  const response = await axios.post("http://localhost:8080/api/auth/login", payload);
 
   // Storing login information
   localStorage.setItem("dineflexUser", JSON.stringify(response.data));
