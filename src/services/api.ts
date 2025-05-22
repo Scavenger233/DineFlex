@@ -18,6 +18,16 @@ const api = axios.create({
   }
 });
 
+// Adding a JWT auto-attach interceptor
+api.interceptors.request.use((config) => {
+  const user = localStorage.getItem('dineflexUser');
+  if (user) {
+    const { token } = JSON.parse(user);
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Mock fallback
 const USE_REAL_BACKEND = true;
 
