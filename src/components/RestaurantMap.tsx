@@ -1,6 +1,5 @@
-
-import React, { useEffect, useRef } from 'react';
-import { MapPin } from 'lucide-react';
+import React, { useState } from "react";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 interface RestaurantMapProps {
   address: string;
@@ -8,28 +7,50 @@ interface RestaurantMapProps {
 }
 
 const RestaurantMap: React.FC<RestaurantMapProps> = ({ address, name }) => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  
-  // In a real application, you would integrate with a mapping API like Google Maps or Mapbox
-  // For now, we'll create a simple placeholder map
-  useEffect(() => {
-    if (mapRef.current) {
-      // In a real implementation, this is where we would initialize the map
-      console.log(`Initializing map for ${name} at ${address}`);
+  const [coordinates, setCoordinates] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+
+  const handleMapLoad = () => {
+    if (!window.google) {
+      console.error("Google Maps JS SDK not loaded");
+      return;
     }
-  }, [address, name]);
+
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ address }, (results, status) => {
+      if (status === "OK" && results && results[0]) {
+        const location = results[0].geometry.location;
+        setCoordinates({ lat: location.lat(), lng: location.lng() });
+      } else {
+        console.error("Geocoding failed:", status);
+      }
+    });
+  };
 
   return (
-    <div className="relative rounded-lg overflow-hidden shadow-md h-64 bg-gray-100">
-      <div ref={mapRef} className="w-full h-full flex items-center justify-center">
-        <div className="text-center">
-          <MapPin className="h-8 w-8 mx-auto text-dineflex-burgundy mb-2" />
-          <p className="font-medium">{name}</p>
-          <p className="text-sm text-gray-600">{address}</p>
-          <p className="text-xs text-gray-500 mt-2 italic">Map view would appear here with real API integration</p>
-        </div>
+    <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
+      <div className="relative rounded-lg overflow-hidden shadow-md h-64 bg-gray-100">
+        {coordinates ? (
+          <GoogleMap
+            mapContainerStyle={{ width: "100%", height: "100%" }}
+            center={coordinates}
+            zoom={15}
+            onLoad={handleMapLoad}
+          >
+            <Marker position={coordinates} title={name} />
+          </GoogleMap>
+        ) : (
+          <GoogleMap
+            mapContainerStyle={{ width: "100%", height: "100%" }}
+            center={{ lat: 53.349805, lng: -6.26031 }} // Dublin fallback
+            zoom={12}
+            onLoad={handleMapLoad}
+          />
+        )}
       </div>
-    </div>
+    </LoadScript>
   );
 };
 
