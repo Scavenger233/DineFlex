@@ -22,8 +22,14 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const user = localStorage.getItem('dineflexUser');
   if (user) {
-    const { token } = JSON.parse(user);
-    config.headers.Authorization = `Bearer ${token}`;
+    try {
+      const { token } = JSON.parse(user);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (e) {
+      console.warn('Invalid dineflexUser format');
+    }
   }
   return config;
 });
