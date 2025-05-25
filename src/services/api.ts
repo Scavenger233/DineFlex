@@ -34,6 +34,21 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Response interceptor to handle expired/invalid token (403/401)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    if (status === 403 || status === 401) {
+      localStorage.removeItem('dineflexUser');
+      localStorage.removeItem('customer');
+      alert('Your session has expired. Please sign in again.');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Mock fallback
 const USE_REAL_BACKEND = true;
 
