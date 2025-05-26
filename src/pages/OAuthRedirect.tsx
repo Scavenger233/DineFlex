@@ -9,14 +9,19 @@ const OAuthRedirect = () => {
     const token = params.get("token");
 
     if (token) {
+      // 1. Save token for future API calls
       localStorage.setItem("dineflexUser", JSON.stringify({ token }));
 
+      // 2. Fetch user info to populate UI state (same as manual login)
       fetch(`${import.meta.env.VITE_API_BASE_URL}/api/customers/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) throw new Error("Bad token");
+          return res.json();
+        })
         .then((user) => {
           localStorage.setItem("customer", JSON.stringify(user));
           navigate("/");

@@ -18,8 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { loginCustomer, registerCustomer } from "@/services/api";
 import { useNavigate } from "react-router-dom";
 
-const GOOGLE_LOGIN_URL =
-  "https://dineflex-backend.onrender.com/oauth2/authorization/google";
+const GOOGLE_LOGIN_URL = "http://localhost:8082/oauth2/authorization/google";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
