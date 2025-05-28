@@ -94,7 +94,17 @@ export const loginCustomer = async (payload: {
   password: string;
 }) => {
   const response = await api.post('/auth/login', payload);
-  localStorage.setItem('dineflexUser', JSON.stringify(response.data));
+
+  // Clear old data before saving new one
+  localStorage.removeItem('dineflexUser');
+  localStorage.removeItem('customer');
+
+  if (response.data?.token) {
+    localStorage.setItem('dineflexUser', JSON.stringify(response.data));
+  } else {
+    console.warn('Login response did not include token.');
+  }
+
   return response.data;
 };
 
